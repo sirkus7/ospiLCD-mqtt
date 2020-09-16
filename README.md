@@ -23,6 +23,9 @@ Install RPLCD library directly from [PyPI](https://pypi.python.org/pypi/RPLCD/) 
 
     $ sudo pip install RPLCD
 
+Install the python netifaces library:
+    $ sudo pip install netifaces
+
 Intall smbus and i2c tools:
 
     $ sudo apt-get install python-smbus i2c-tools
@@ -100,3 +103,6 @@ Green LCD 20x4:
 
 Green LCD 20x4 and ospi with expansion board (E1):
 ![20x4 lcd exp.](/img/ospilcd7.jpg)
+
+# Helpful References
+* Open Sprinkler API Documentation: https://openthings.freshdesk.com/support/solutions/folders/5000147084

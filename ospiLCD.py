@@ -13,6 +13,7 @@ from collections import namedtuple
 from time import *
 from RPLCD import i2c
 from subprocess import check_output
+import netifaces
 
 """ ################ Parameters #################### """
 osAddress = "127.0.0.1"  # OpenSprinkler address (default 127.0.0.1)
@@ -23,6 +24,7 @@ LCD_i2c_address = 0x27  # LCD I2C address (default 0x27)
 LCD_cols = 16  # LCD columns (16 or 20)
 LCD_rows = 2   # LCD rows (2 or 4)
 date_locale = 'en_US.UTF-8'  # Set to your Raspberry pi locale eg. 'en_GB.UTF-8' or 'it_IT.UTF-8'
+net_iface = 'wlan0' # Set to network interface used for communication (eg. wlan0, eth0)
 
 """
 this example generate md5 pass
@@ -92,18 +94,18 @@ if ja.options.re == 1:
 else:
 	mc = mc+' '
 
-# get sensor status (0 1 2 240)
-if ja.options.urs == 1:
+# get sensor (0=none, 1=rain, 2=flow, 3=soil, 240=program switch)
+if ja.options.sn1t == 1:
 	if ja.settings.rd == 1 or ja.settings.rs == 1:
 		mc = mc+'\x03'
 	else:
 		mc = mc+' '
-elif ja.options.urs == 2:
+elif ja.options.sn1t == 2:
 	mc = mc+'\x06'
-elif ja.options.urs == 240:
+elif ja.options.sn1t == 240:
 	mc = mc+'\x07'
 else:
-	mc = mc+' '
+	mc = mc+' ' # Note, currently no icon for 3=soil. (todo)
 
 # get uSD status
 if ja.settings.wto:
@@ -112,7 +114,7 @@ else:
 	mc = mc+''
 
 # check local network status
-net_ip = check_output(['hostname', '-I'])
+net_ip = netifaces.ifaddresses(net_iface)[2][0]['addr']
 if len(net_ip) > 7:
 	mc = mc+'\x00'
 else:
@@ -154,7 +156,7 @@ if LCD_rows == 4:
 
 #######################################################################################################
 # Detect LCD backlight status
-if ja.options.lit > 1:
+if "lit" in ja.options and ja.options.lit > 1:
 	backlight = True
 else:
 	backlight = False
