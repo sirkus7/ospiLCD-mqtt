@@ -105,4 +105,4 @@ Green LCD 20x4 and ospi with expansion board (E1):
 ![20x4 lcd exp.](/img/ospilcd7.jpg)
 
 # Helpful References
-* Open Sprinkler API Documentation: https://openthings.freshdesk.com/support/solutions/folders/5000147084
+* Open Sprinkler API Documentation: https://openthings.freshdesk.com/support/solutions/articles/5000716363-os-api-documents
