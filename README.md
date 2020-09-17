@@ -24,6 +24,7 @@ Install RPLCD library directly from [PyPI](https://pypi.python.org/pypi/RPLCD/) 
     $ sudo pip install RPLCD
 
 Install the python netifaces library:
+
     $ sudo pip install netifaces
 
 Intall smbus and i2c tools:
