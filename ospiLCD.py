@@ -45,6 +45,7 @@ except ImportError:
 
 def get_data(url):
 	data = urlopen(url).read()
+	data = data.replace("\"pass\":", "\"password\":") # Replace protected keyword "pass" with acceptable term "password"
 	variables = json.loads(data, object_hook=lambda d: namedtuple('X', d.keys())(*d.values()))
 	return variables
 
