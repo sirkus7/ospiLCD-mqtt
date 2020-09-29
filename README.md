@@ -29,9 +29,10 @@ Install RPLCD library directly from [PyPI](https://pypi.python.org/pypi/RPLCD/) 
 
     $ sudo pip install RPLCD
 
-Install the python netifaces library:
+Install the python netifaces and paho-mqtt library:
 
     $ sudo pip install netifaces
+    $ sudo pip install paho-mqtt
 
 Intall ospiLCD script:
 
