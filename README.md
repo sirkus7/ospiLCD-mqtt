@@ -19,6 +19,12 @@ This is OpenSprinkler pi I2C LCD python script which gets data from OpenSprinkle
 Installation instructions
 =====
 
+Use apt to install pip, smbus, and i2c tools:
+
+    $ sudo apt update
+    $ sudo apt upgrade -y
+    $ sudo apt install python-pip python-smbus i2c-tools
+
 Install RPLCD library directly from [PyPI](https://pypi.python.org/pypi/RPLCD/) using pip:
 
     $ sudo pip install RPLCD
@@ -26,10 +32,6 @@ Install RPLCD library directly from [PyPI](https://pypi.python.org/pypi/RPLCD/) 
 Install the python netifaces library:
 
     $ sudo pip install netifaces
-
-Intall smbus and i2c tools:
-
-    $ sudo apt-get install python-smbus i2c-tools
 
 Intall ospiLCD script:
 
