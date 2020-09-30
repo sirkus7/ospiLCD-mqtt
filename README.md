@@ -53,7 +53,7 @@ Install RPLCD, netifaces, and paho-mqtt libraries directly from [PyPI](https://p
 Install ospiLCD script from github:
 
     $ cd /home/pi/
-    $ wget  https://raw.githubusercontent.com/sirkus7/ospiLCD-mqtt/master/ospiLCD-mqtt.py
+    $ wget  https://raw.githubusercontent.com/sirkus7/ospiLCD/mqtt-notify/ospiLCD-mqtt.py
     $ chmod +x ospiLCD-mqtt.py
     
 Edit the `ospiLCD-mqtt.py` file, find the "Configuration Parameters" section near the beginning of the file, and edit the variables to fit your needs. 
