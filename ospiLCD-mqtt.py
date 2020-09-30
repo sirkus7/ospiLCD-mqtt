@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 
 """
-OpenSprinkler pi I2C LCD, remote MQTT enabled monitor
-Based on Code by Stanley https://github.com/stanoba/
-Enhanced by Sirkus7 https://github.com/sirkus7
-Version: 0.1
-
+ospiLCD-mqtt.py
+OpenSprinkler status display, MQTT enabled
+https://github.com/sirkus7/ospiLCD-mqtt
+Based on original project by Stanley https://github.com/stanoba/ospiLCD
+Version: 0.7
 """
 
 import signal
@@ -22,22 +22,26 @@ import netifaces
 import paho.mqtt.client as mqtt
 from urllib2 import urlopen # For Python3: from urllib.request import urlopen	
 
-################ Parameters ####################
-mqttAddress = "192.168.10.10"  # SET TO IP Address (or hostname) of MQTT broker (server)
-mqttPort   = "1883" # Port of MQTT broker
-osAddress = "127.0.0.1"  # SET TO OpenSprinkler address
-osPort = 8080  # OpenSprinkler port (default 8080)
+################ Configuration Parameters ####################
+# Set OpenSprinkler system info (address, port, password hash)
+osAddress = "ospi.lan"  # IP Address or hostname of the opensprinkler system
+osPort = 8080  
 md5hash = "a6d82bced638de3def1e9bbb4983225c"  # OpenSprinkler password MD5 hash (default opendoor)
+# Set MQTT info (defaults to localhost, if MQTT server is running on Pi)
+mqttAddress = "127.0.0.1"
+mqttPort   = "1883"
+# Set I2C LCD Info
 LCD_i2c_expander = 'PCF8574'  # PCF8574 (default, ebay), MCP23008 (used in Adafruit I2C LCD backpack) or MCP23017
 LCD_i2c_address = 0x27  # LCD I2C address (default 0x27)
 LCD_cols = 20  # LCD columns (16 or 20)
 LCD_rows = 4   # LCD rows (2 or 4)
+backlight_timeout = 60.0 # Float, seconds to keep display lit after showing data before dimming. 0.0" Disables, keeps backlight on at all times. 
+# Set Raspberry Pi System Info
 date_locale = 'en_US.UTF-8'  # Set to your Raspberry pi locale eg. 'en_GB.UTF-8' or 'it_IT.UTF-8'
 net_iface = 'wlan0' # Set to network interface used for communication (eg. wlan0, eth0)
-backlight_timeout = 60.0 # Float, seconds to keep display lit after showing data before dimming
 
 """
-# Use this python code to generate md5hash of your OpenSprinkler password
+# Use this snippet of code to generate the md5hash value for your OpenSprinkler password
 import md5
 md5hash=md5.new('opendoor').hexdigest()
 print(md5hash)
@@ -56,14 +60,14 @@ def signal_handler(sig, frame):
 	sys.exit(0)
 
 def mqtt_connect(client, userdata, flags, rc):
-	#print("[Connected with result code {0}]".format(str(rc))) # For debugging MQTT connect message
+	print("[Connected with result code {0}]".format(str(rc))) # For debugging MQTT connect message
 	client.subscribe("opensprinkler/#")  # Subscribe to the topic, receive any messages published on it
 	lcd.backlight_enabled = True
 	lcd.cursor_pos = (0, 0)
 	lcd.write_string("MQTT Connected\r\nReqesting info")
 
-def mqtt_message(client, userdata, msg):  # The callback for when a PUBLISH message is received from the server.
-	#print('Msg:' + msg.topic + ": " + str(msg.payload))  # Debug MQTT messages recieved.
+def mqtt_message(client, userdata, msg): 
+	print('Msg:' + msg.topic + ": " + str(msg.payload))  # Debug MQTT messages recieved.
 	update_display()
 
 def get_data(url):
@@ -138,7 +142,7 @@ def update_display():
 	elif ja.options.sn1t == 240:
 		mc = mc+'\x07'
 	else:
-		mc = mc+' ' # Note, currently no icon for 3=soil. (todo)
+		mc = mc+'' # Note, currently no icon for 3=soil. (todo)
 
 	# get uSD status
 	if ja.settings.wto:
@@ -159,8 +163,6 @@ def update_display():
 		totaltime = totaltime+station[1]
 	r_m, r_s = divmod(totaltime, 60)
 	r_h, r_m = divmod(r_m, 60)
-
-	
 
 	# Define LCD lines 1 & 2
 	locale.setlocale(locale.LC_ALL, date_locale)
@@ -192,7 +194,7 @@ def update_display():
 	lcd.backlight_enabled = True
 
 	# Write new information
-	lcd.cursor_pos = (0, 0)
+	lcd.clear()
 	lcd.write_string(line1)
 	lcd.cursor_pos = (1, 0)
 	lcd.write_string(line2)
@@ -201,9 +203,14 @@ def update_display():
 		lcd.write_string(line3)
 		lcd.cursor_pos = (3, 0)
 		lcd.write_string(line4)
-
-	# If "lit" parameter exists and enabled, stay lit, otherwise, dim after backlight_timeout seconds
-	if  not ("lit" in ja.options and ja.options.lit > 1):
+		
+	# If "lit" parameter exists use it, otherwise, dim after "backlight_timeout" seconds
+	if "lit" in ja.options :
+		if ja.options.lit > 1 : 
+			lcd.backlight_enabled = True
+		else:
+			lcd.backlight_enabled = False
+	elif backlight_timeout > 0.1 :  # Set Timer to dim backlight after specified time. 
 		dim_timer.cancel()
 		dim_timer = Timer(backlight_timeout, dim_backlight)
 		dim_timer.start() 
@@ -240,8 +247,11 @@ lcd.create_char(5, i_rext)
 lcd.create_char(6, i_flow)
 lcd.create_char(7, i_psw)
 
+lcd.clear()
+lcd.write_string("Connecting to\r\nMQTT broker...")
+
 # === Setup MQTT client, actions ===
-client = mqtt.Client('ospilcd')  
+client = mqtt.Client()  
 client.on_connect = mqtt_connect  
 client.on_message = mqtt_message  
 client.connect(mqttAddress, mqttPort, 60)
