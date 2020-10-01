@@ -11,7 +11,7 @@ This python script monitors an OpenSprinkler station and displays its status on 
 * Can be used as remote OpenSprinkler LCD display, or on a OpenSprinklerPi system. 
 * Runs well on all current Raspberry Pis (2, 3, 4, Zero W)
 
-This is based on code from Stanley's excellent build at https://github.com/stanoba/ospiLCD. Please refer to his project for designs for 3D printed case, and other build tips. This MQTT version enhahncemnt makes two important functional changes from Stanley's project:
+This is based on code from Stanley's excellent build at https://github.com/stanoba/ospiLCD. Please refer to his project for designs for 3D printed case, pcb designs, and other build tips. This MQTT version enhahncemnt makes two important functional changes from Stanley's project:
 * It subscribes to an MQTT server to receive immediate notifications of OpenSprinkler events, then uses the OpenSprinkler API to gather current data.
 * Rather than a "one shot" script that runs from a cron job, this script runs ongoing in a service loop, responding to events as needed. 
 
@@ -53,7 +53,7 @@ Install RPLCD, netifaces, and paho-mqtt libraries directly from [PyPI](https://p
 Install ospiLCD script from github:
 
     $ cd /home/pi/
-    $ wget  https://raw.githubusercontent.com/sirkus7/ospiLCD/mqtt-notify/ospiLCD-mqtt.py
+    $ wget https://raw.githubusercontent.com/sirkus7/ospiLCD-mqtt/master/ospiLCD-mqtt.py
     $ chmod +x ospiLCD-mqtt.py
     
 Edit the `ospiLCD-mqtt.py` file, find the "Configuration Parameters" section near the beginning of the file, and edit the variables to fit your needs. 
