@@ -1,6 +1,8 @@
 # ospiLCD-mqtt.py
 
-This python script monitors an OpenSprinkler station and displays its status on an I2C LCD as events occur by using MQTT. It can be run on the OpenSprinkler controller itself (if it is the Pi version), or on a separate Rasperry Pi as a remote status display.
+This python script monitors an OpenSprinkler station and displays its status on an I2C LCD as events occur by using MQTT. It can be run on the OpenSprinkler controller itself (if it is the Pi version), or on a separate Rasperry Pi as a remote status display. <img align="right" src="img/ospilcd5sm.jpg" caption="Example status display, 2 Line LCD">*(Example, 2 line LCD status display shown on the right.)*
+
+
 
 **Features:**
 * 16x2 and 20x4 I2C LCDs are supported (PCF8574T based, after some changes MCP23008 is supported too)
@@ -11,20 +13,17 @@ This python script monitors an OpenSprinkler station and displays its status on 
 * Can be used as remote OpenSprinkler LCD display, or on a OpenSprinklerPi system. 
 * Runs well on all current Raspberry Pis (2, 3, 4, Zero W)
 
-This is based on code from Stanley's excellent build at https://github.com/stanoba/ospiLCD. Please refer to his project for designs for 3D printed case, pcb designs, and other build tips. This MQTT version enhahncemnt makes two important functional changes from Stanley's project:
+<img align="right" src="img/ospilcd9sm.jpg" caption="_4 line display, built into OpenSprinkler Pi, using Stanley's build"> This is based on code from Stanley's excellent build at https://github.com/stanoba/ospiLCD. Please refer to his project for designs for 3D printed case, pcb designs, and other build tips. *(Shown to the right, a _4 line LCD status display, built into OpenSprinkler Pi, using Stanley's build)*
+
+This ospiLCD-mqtt version makes two functional changes from the ospiLCD project that are important to note up front:
 * It subscribes to an MQTT server to receive immediate notifications of OpenSprinkler events, then uses the OpenSprinkler API to gather current data.
 * Rather than a "one shot" script that runs from a cron job, this script runs ongoing in a service loop, responding to events as needed. 
 
-_Example status, 2 line display:_ | _4 line display, built into OpenSprinkler Pi, using Stanley's build:_
----------------------------------|---------------------------------------------
-![Example 2 line display](img/ospilcd5sm.jpg) | ![Example Status Display](img/ospilcd9sm.jpg)
-
-There are two general parts to the setup, 
+In this README, we'll walk through two general parts to the setup, 
 1. Setting up the Rasperry Pi with the LCD display and the software
-2. Setting up an MQTT notifications.
+2. Setting up MQTT notifications.
 
-# Raspberry Pi Setup and Installation
-
+# Setup and Installation
 
 ## Installing the LCD Display
 Use an I2C LCD display module supported by the RPLCD library. Details about what display modules are supported, and how to wire the LCD to the Raspberry Pi are well documented in the [RPLCD library docs, here.](https://rplcd.readthedocs.io/en/stable/getting_started.html) 
@@ -55,14 +54,9 @@ Install ospiLCD script from github:
     $ cd /home/pi/
     $ wget https://raw.githubusercontent.com/sirkus7/ospiLCD-mqtt/master/ospiLCD-mqtt.py
     $ chmod +x ospiLCD-mqtt.py
-    
-Edit the `ospiLCD-mqtt.py` file, find the "Configuration Parameters" section near the beginning of the file, and edit the variables to fit your needs. 
 
-# MQTT Setup
-OpenSprinkler has built in support for MQTT, which is a lightweight messaging protocol used by many IoT devices to communicate status and updates. There are a number of popular cloud based MQTT services available that you could use, if you don't want to run your own. Or, you can easily run an MQTT server on your Raspberry Pi, or a Linux system on your network. 
-
-## Install/Setup a MQTT broker (Optional)
-If you would like to use a cloud based MQTT broker, skip this section and proceed to the next section. 
+## Install/Setup a MQTT broker
+OpenSprinkler has built in support for MQTT, which is a lightweight messaging protocol used by many IoT devices to communicate status and updates. There are a number of popular cloud based MQTT services available that you could use, if you don't want to run your own. Or, you can easily run an MQTT server on your Raspberry Pi, or a Linux system on your network. If you would like to use a cloud based MQTT broker, skip this section and proceed to the next section. 
 
 Install the "mosquitto" MQTT broker on your Rasbperry Pi (or another Linux system on the network.)
 
@@ -75,7 +69,6 @@ To double check that mosquitto process is running, you can use `ps`:
     $ ps -e | grep mosquitto 
     10806 ?        00:00:00 mosquitto
 
-
 Now, you need to get the IP address of your new MQTT broker in order to tell your OpenSprinkler system where to find it. You can get this using the following command:
 
     $ hostname -I
@@ -85,7 +78,6 @@ Take note of the first part of the resonse, the IPv4 address of your Raspberry P
 ## Configure OpenSprinkler System to use MQTT
 In the OpenSprinker UI, configure the MQTT server (broker) information. Do this by clicking on the multi square icon in the bottom right, and choosing "Edit Options", then select the "Integration" section (shown below, left). Find MQTT and click "Tap to Configure" next to it. 
 
-
 1: OpenSprinkler Edit Options, Integration | 2: MQTT Settings
 ----------------------------------------|---------------
 ![Edit Options, Integration](img/OS-EditOptions.png) | ![MQTT Options](img/OS-MQTT_settings.png)
@@ -94,14 +86,33 @@ Fill in the IP address of the MQTT server (shown above, right). If you're using 
 
 Click submit, and return to the main screen. 
 
-## Configure ospiLCD-mqtt.py with MQTT info
-On the Raspberry Pi, edit the `ospiLCD-mqtt.py` file, end set the MQTT related settings to match those you entered into the OpenSprinkler system (server IP address and port.)
+## Configure ospiLCD-mqtt.py
+Edit the `ospiLCD-mqtt.py` file:
+    $ nano ospiLCD-mqtt.py
+  
+Find the "Configuration Parameters" section near the beginning of the file, and set these appropriately for your setup. 
 ```python
-    # Set MQTT info
-    mqttAddress = "127.0.0.1"
-    mqttPort   = "1883"
+################ Configuration Parameters ####################
+# Set OpenSprinkler system info (address, port, password hash)
+osAddress = "ospi.lan"  # IP Address or hostname of the opensprinkler system
+osPort = 8080  
+md5hash = "a6d82bced638de3def1e9bbb4983225c"  # OpenSprinkler password MD5 hash (default opendoor)
+# Set MQTT info (defaults to localhost, if MQTT server is running on Pi)
+mqttAddress = "127.0.0.1"
+mqttPort   = "1883"
+# Set I2C LCD Info
+LCD_i2c_expander = 'PCF8574'  # PCF8574 (default, ebay), MCP23008 (used in Adafruit I2C LCD backpack) or MCP23017
+LCD_i2c_address = 0x27  # LCD I2C address (default 0x27)
+LCD_cols = 20  # LCD columns (16 or 20)
+LCD_rows = 4   # LCD rows (2 or 4)
+backlight_timeout = 60.0 # Float, seconds to keep display lit after showing data before dimming. 0.0" Disables, keeps backlight on at all times. 
+# Set Raspberry Pi System Info
+date_locale = 'en_US.UTF-8'  # Set to your Raspberry pi locale eg. 'en_GB.UTF-8' or 'it_IT.UTF-8'
+net_iface = 'wlan0' # Set to network interface used for communication (eg. wlan0, eth0)
 ```
-Note, that if you're running the MQTT server on the Raspberry Pi as we're doing here, the defaults shown above will work fine. You can use the either address identified earlier, or you can use 127.0.0.1, which points to the local Raspberry Pi. If you're using another MQTT server or cloud service, enter the address and port for that service here. 
+The osAddress must be set to your OpenSprinkler IP address, and this address must be accessable to your Raspberry Pi. If you're running 'ospiLCD-mqtt.py' on the OpenSprinkler Pi, then you can set this address to "127.0.0.1" refering to itself. 
+
+Similarly, if you're running the MQTT server on the Raspberry Pi as we did in these instructions, the defaults for the MQTT settings shown above will work fine. You can use the either address identified earlier, or you can use 127.0.0.1, refering to the local Raspberry Pi. If you're running the MQTT server elsewhere, or if you're using another MQTT server or cloud service, enter the address and port for that service here. 
 
 ## Run ospiLCD-mqtt.py
 Now we're all ready to to run:
