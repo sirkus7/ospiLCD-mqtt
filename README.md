@@ -1,7 +1,9 @@
 # ospiLCD-mqtt.py
 
-This python script monitors an OpenSprinkler station and displays its status on an I2C LCD as events occur by using MQTT. It can be run on the OpenSprinkler controller itself (if it is the Pi version), or on a separate Rasperry Pi as a remote status display. <img align="right" src="img/ospilcd5sm.jpg" caption="Example status display, 2 Line LCD">*(Example, 2 line LCD status display shown on the right.)*
+This python script monitors an OpenSprinkler station and displays its status on an I2C LCD as events occur by using MQTT. It can be run on the OpenSprinkler controller itself (if it is the Pi version), or on a separate Rasperry Pi as a remote status display. 
 
+*Example status display, run on a Raspberry Pi Zero W*
+![Example status display, run from Rasbperry Pi Zero W](img/ospiLCD-mqtt-RPi0w.jpg)
 
 
 **Features:**
@@ -13,7 +15,7 @@ This python script monitors an OpenSprinkler station and displays its status on 
 * Can be used as remote OpenSprinkler LCD display, or on a OpenSprinklerPi system. 
 * Runs well on all current Raspberry Pis (2, 3, 4, Zero W)
 
-<img align="right" src="img/ospilcd9sm.jpg" caption="_4 line display, built into OpenSprinkler Pi, using Stanley's build"> This is based on code from Stanley's excellent build at https://github.com/stanoba/ospiLCD. Please refer to his project for designs for 3D printed case, pcb designs, and other build tips. *(Shown to the right, a _4 line LCD status display, built into OpenSprinkler Pi, using Stanley's build)*
+<img align="right" src="img/ospilcd9sm.jpg" alt="4 line display, built into OpenSprinkler Pi, using Stanley's build"> This project is based on code from Stanley's excellent build at https://github.com/stanoba/ospiLCD. Please refer to his project for designs for 3D printed case, pcb designs, and other build tips. *(Shown to the right, a _4 line LCD status display, built into OpenSprinkler Pi, using Stanley's build)*
 
 This ospiLCD-mqtt version makes two functional changes from the ospiLCD project that are important to note up front:
 * It subscribes to an MQTT server to receive immediate notifications of OpenSprinkler events, then uses the OpenSprinkler API to gather current data.
