@@ -1,6 +1,6 @@
 # ospiLCD-mqtt.py
 
-This python script monitors an OpenSprinkler station and displays its status on an I2C LCD as events occur by using MQTT. It can be run on the OpenSprinkler controller itself (if it is the Pi version), or on a separate Rasperry Pi as a remote status display. 
+This python script monitors an OpenSprinkler station and displays its status on an I2C LCD as events occur by using MQTT. It can be run on the OpenSprinkler controller itself (if it is the Pi version), or on a separate Rasperry Pi as a remote status display as shown below. 
 
 *Example status display, run on a Raspberry Pi Zero W*
 ![Example status display, run from Rasbperry Pi Zero W](img/ospiLCD-mqtt-RPi0w.jpg)
@@ -127,20 +127,20 @@ When `ospiLCD-mqtt.py` is run, the the LCD Screen should should light, briefly i
     Connecting to
     MQTT broker...
 
-If it cannot connect to the MQTT server, it will stay on this message indefinately. In this case, check the MQTT server settings in `ospiLCD-mqtt.py`.
+If it cannot connect to the MQTT server, it will stay on this message indefinately. In this case, check the MQTT server settings in `ospiLCD-mqtt.py`and then try again.
 
-If it successfully connects to the MQTT broker, It will display the following message:
+If it successfully connects to the MQTT broker, it will display the following message:
 
     MQTT Connected
     Requesting Info
 
-If it stays on this message now, this means it eitehr cannot successfully connect to and query the OpenSprinkler system API, or the OpenSprinkler system is not able to connect to the MQTT server. In this case, double check the MQTT server parameters in `ospiLCD-mqtt.py` and inyour OpenSprinkler system. 
+If it stays on this message, this means it either cannot connect to and query the OpenSprinkler system API, or the OpenSprinkler system is not able to connect to the MQTT server. In this case, double check the MQTT related parameters in `ospiLCD-mqtt.py` and in your OpenSprinkler system, and then try again. 
 
-If all is successful, the above messages are only shown briefly, and then the OpenSprinkler status is shown on the LCD display, such as below: 
+If all is successful, the above messages will only be shown briefly as it successfully subscribes to MQTT messages, queries the OpenSprinkler status, and then formats and displays the status LCD display, such as below: 
 
 ![20x4 lcd status display](img/ospilcd5sm.jpg)
 
-
+Congrats!
 
 # Helpful References
 * Stanley's ospiLCD project: https://github.com/stanoba/ospiLCD
